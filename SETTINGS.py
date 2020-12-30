@@ -1,6 +1,8 @@
 import pygame
 import copy
 
+"""""Описываем пути к разным дополнениям к игре"""
+
 BOARDPATH = "assets/BoardImages/"
 ELEMENTPATH = "assets/ElementImages/"
 TEXTPATH = "assets/TextImages/"
@@ -11,6 +13,7 @@ pygame.init()
 pygame.mixer.init()
 print(pygame.mixer.music.get_busy())
 
+# Описываем карту
 ORIGINALGAMEBOARD = [
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
@@ -49,11 +52,13 @@ ORIGINALGAMEBOARD = [
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
 ]
+
+# Создаем константы, нужные в игре
 GAMEBOARD = copy.deepcopy(ORIGINALGAMEBOARD)
 SPRITERATIO = 3 / 2
-SQUARE = 30
-SPRITEOFFSET = SQUARE * (1 - SPRITERATIO) * (1 / 2)
-WIDTH, HEIGHT = (len(GAMEBOARD[0]) * SQUARE, len(GAMEBOARD) * SQUARE)
+square = 30
+SPRITEOFFSET = square * (1 - SPRITERATIO) * (1 / 2)
+WIDTH, HEIGHT = (len(GAMEBOARD[0]) * square, len(GAMEBOARD) * square)
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.flip()
 MUSICPLAYING = 0
