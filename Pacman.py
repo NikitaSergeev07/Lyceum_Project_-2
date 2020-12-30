@@ -1,4 +1,5 @@
 import pygame
+import numpy
 import math
 from main import canMove
 import random
