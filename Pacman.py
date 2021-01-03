@@ -6,7 +6,7 @@ import random
 import os
 from SETTINGS import BOARDPATH, ELEMENTPATH, TEXTPATH, DATAPATH, MUSICPATH, MUSICPLAYING, DEFAULTCOLOR, SPRITERATIO, \
     square, SPRITEOFFSET, WIDTH, HEIGHT, SCREEN
-from Game import game
+from main import game
 
 
 class Pacman():
