@@ -4,7 +4,9 @@ import math
 from main import canMove
 import random
 import os
-from SETTINGS import BOARDPATH, ELEMENTPATH, TEXTPATH, DATAPATH, MUSICPATH, MUSICPLAYING, DEFAULTCOLOR
+from SETTINGS import BOARDPATH, ELEMENTPATH, TEXTPATH, DATAPATH, MUSICPATH, MUSICPLAYING, DEFAULTCOLOR, SPRITERATIO, \
+    square, SPRITEOFFSET, WIDTH, HEIGHT, SCREEN
+from Game import game
 
 
 class Pacman():
@@ -59,3 +61,43 @@ class Pacman():
         elif self.dir == 3:
             if canMove(self.row, math.floor(self.col - self.pacSpeed)) and self.row % 1.0 == 0:
                 self.col -= self.pacSpeed
+
+        """"Метод, рисующий Пакмана, основываясь на его положении в текущий момент"""
+
+    def draw(self):
+        if not game.started:
+            pacmanImage = pygame.image.load(ELEMENTPATH + "tile112.png")
+            pacmanImage = pygame.transform.scale(pacmanImage, (int(square * SPRITERATIO), int(square * SPRITERATIO)))
+            SCREEN.blit(pacmanImage,
+                        (self.col * square + SPRITEOFFSET, self.row * square + SPRITEOFFSET, square, square))
+            return
+
+        if self.mouthChangeCount == self.mouthChangeDelay:
+            self.mouthChangeCount = 0
+            self.mouthOpen = not self.mouthOpen
+        self.mouthChangeCount += 1
+        # /
+        if self.dir == 0:
+            if self.mouthOpen:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile049.png")
+            else:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile051.png")
+        elif self.dir == 1:
+            if self.mouthOpen:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile052.png")
+            else:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile054.png")
+        elif self.dir == 2:
+            if self.mouthOpen:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile053.png")
+            else:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile055.png")
+        elif self.dir == 3:
+            if self.mouthOpen:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile048.png")
+            else:
+                pacmanImage = pygame.image.load(ELEMENTPATH + "tile050.png")
+
+        pacmanImage = pygame.transform.scale(pacmanImage, (int(square * SPRITERATIO), int(square * SPRITERATIO)))
+        SCREEN.blit(pacmanImage,
+                    (self.col * square + SPRITEOFFSET, self.row * square + SPRITEOFFSET, square, square))
