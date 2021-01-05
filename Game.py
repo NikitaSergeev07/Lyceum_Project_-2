@@ -1,8 +1,10 @@
 from Ghost import Ghost
-from SETTINGS import DATAPATH, GAMEBOARD
+from SETTINGS import BOARDPATH, ELEMENTPATH, TEXTPATH, DATAPATH, MUSICPATH, MUSICPLAYING, DEFAULTCOLOR, SPRITERATIO, \
+    square, SPRITEOFFSET, WIDTH, HEIGHT, SCREEN
 from Pacman import Pacman
 from random import randrange
 import random
+import pygame
 
 
 class Game():
@@ -54,7 +56,7 @@ class Game():
         self.extraLifeGiven = False
         self.musicPlaying = 0
 
-    """"Метод для обновления рекорда"""
+    """"Метод для получения рекорда"""
 
     def getHighScore(self):
         file = open(DATAPATH + "HighScore.txt", "r")
@@ -71,3 +73,26 @@ class Game():
                 if GAMEBOARD[i][j] == 2 or GAMEBOARD[i][j] == 5 or GAMEBOARD[i][j] == 6:
                     total += 1
         return total
+
+    """"Метод для обновления рекорда"""
+
+    def recordHighScore(self):
+        file = open(DATAPATH + "HighScore.txt", "w").close()
+        file = open(DATAPATH + "HighScore.txt", "w+")
+        file.write(str(self.highScore))
+        file.close()
+
+    """"Метод для смены цвета тиктаков"""
+
+    def flipColor(self):
+        global GAMEBOARD
+        for i in range(3, len(GAMEBOARD) - 2):
+            for j in range(len(GAMEBOARD[0])):
+                if GAMEBOARD[i][j] == 5:
+                    GAMEBOARD[i][j] = 6
+                    pygame.draw.circle(SCREEN, DEFAULTCOLOR, (j * square + square // 2, i * square + square // 2),
+                                       square // 2)
+                elif GAMEBOARD[i][j] == 6:
+                    GAMEBOARD[i][j] = 5
+                    pygame.draw.circle(square, (0, 0, 0), (j * square + square // 2, i * square + square // 2),
+                                       square // 2)

@@ -4,7 +4,7 @@ from Pacman import Pacman
 from Ghost import Ghost
 
 game = Game(1, 0)
-ghostsafeArea = [15, 13]  # Мдесто, куда убегают призраки, когда на них нападают
+ghostsafeArea = [15, 13]  # Место, куда убегают призраки, когда на них нападают
 ghostGate = [[15, 13], [15, 14]]
 
 

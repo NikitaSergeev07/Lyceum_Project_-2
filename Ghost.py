@@ -40,14 +40,30 @@ class Ghost():
         if self.col < 0:
             self.col = len(GAMEBOARD[0]) - 0.5
 
+    def isValidTwo(self, cRow, cCol, dist, visited):
+        if cRow < 3 or cRow >= len(GAMEBOARD) - 5 or cCol < 0 or cCol >= len(GAMEBOARD[0]) or GAMEBOARD[cRow][
+            cCol] == 3:
+            return False
+        elif visited[cRow][cCol] <= dist:
+            return False
+        return True
+
+    """"Установление атаки"""
+
     def setAttacked(self, isAttacked):
         self.attacked = isAttacked
+
+    """"Атакован"""
 
     def isAttacked(self):
         return self.attacked
 
+    """"Если съеден пакманом, то умер"""
+
     def setDead(self, isDead):
         self.dead = isDead
+
+    """"Проверка на смерть"""
 
     def isDead(self):
         return self.dead
