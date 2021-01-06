@@ -1,69 +1,79 @@
-from SETTINGS import GAMEBOARD
-from random import randrange
+import pygame
+from main import load_image
+from SETTINGS import HEIGHT, WIDTH, all_ghosts, GHOSTS, FULLNAME
 
 
-class Ghost():
-    """"Создаем конструктор класса Ghost"""
+class Ghost(pygame.sprite.Sprite):
+    """
+    Класс привидений для стартового меню
+    """
 
-    def __init__(self, row, col, color, changeFeetCount):
-        self.row = row
-        self.col = col
-        self.attacked = False
-        self.color = color
-        self.dir = randrange(4)
-        self.dead = False
-        self.changeFeetCount = changeFeetCount
-        self.changeFeetDelay = 5
-        self.target = [-1, -1]
-        self.ghostSpeed = 0.25
-        self.lastLoc = [-1, -1]
-        self.attackedTimer = 240
-        self.attackedCount = 0
-        self.deathTimer = 120
-        self.deathCount = 0
+    def __init__(self, group, ghost_name):
+        super().__init__(group)
+        file_name = ghost_name[0]
+        text = ghost_name[1]
+        self.group = group
+        image = load_image(file_name)
+        # Скорость призрака
+        self.v = 5
+        self.moving = True
+        self.show_name = False
+        self.is_moving = True
+        self.made_stop = False
+        self.size = image.get_width()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = - 600
+        self.rect.y = HEIGHT // 2 - 180
 
-    """Метод для обновления положения Призрака в пространстве"""
+        # Вывод имен призраков
+        font = pygame.font.Font(FULLNAME, 30)
+        self.text = font.render(text, 1, (ghost_name[2]))
+        self.start_x = WIDTH // 2 - self.text.get_width() // 2
+        self.start_y = HEIGHT // 2 - 180
 
     def move(self):
-        self.lastLoc = [self.row, self.col]
-        if self.dir == 0:
-            self.row -= self.ghostSpeed
-        elif self.dir == 1:
-            self.col += self.ghostSpeed
-        elif self.dir == 2:
-            self.row += self.ghostSpeed
-        elif self.dir == 3:
-            self.col -= self.ghostSpeed
+        """
+        Движение призрака по экрану
+        :return: Перемещение призрака, его остановка в центре экрана,
+        установка таймера для изображения имени призрака
+        """
+        if self.is_moving and self.moving:
+            self.rect.x += self.v
+        if not self.made_stop:
+            if self.rect.x >= WIDTH // 2 + self.text.get_width() // 2 + 10:
+                self.show_name = True
+                self.is_moving = False
+                self.made_stop = True
 
-        # На случай если они пойдут через средний туннель
-        self.col = self.col % len(GAMEBOARD[0])
-        if self.col < 0:
-            self.col = len(GAMEBOARD[0]) - 0.5
+        if self.rect.x >= WIDTH + self.size:
+            self.is_moving = False
+            self.stop(1)
 
-    def isValidTwo(self, cRow, cCol, dist, visited):
-        if cRow < 3 or cRow >= len(GAMEBOARD) - 5 or cCol < 0 or cCol >= len(GAMEBOARD[0]) or GAMEBOARD[cRow][
-            cCol] == 3:
-            return False
-        elif visited[cRow][cCol] <= dist:
-            return False
-        return True
+    def stop(self, pos=0):
+        """
+        Остановка привидений
+        :param pos: отвечает за удаление спрайта призрака
+        после выхода за пределы экрана
+        :return: Остановка прдыдущего призрака и создание нового
+        """
+        global ghost_on_screen
+        if pos == 1 and self.moving:
+            self.moving = False
+            self.kill()
+            ghost_on_screen += 1
+            if ghost_on_screen == 4:
+                ghost_on_screen = 0
+            Ghost(all_ghosts, GHOSTS[ghost_on_screen])
+            Ghost.moving = True
+            Ghost.is_moving = True
+            Ghost.made_stop = False
 
-    """"Установление атаки"""
-
-    def setAttacked(self, isAttacked):
-        self.attacked = isAttacked
-
-    """"Атакован"""
-
-    def isAttacked(self):
-        return self.attacked
-
-    """"Если съеден пакманом, то умер"""
-
-    def setDead(self, isDead):
-        self.dead = isDead
-
-    """"Проверка на смерть"""
-
-    def isDead(self):
-        return self.dead
+    def continue_moving(self):
+        """
+        Продолжение движения
+        :return:
+        """
+        if self.moving:
+            self.show_name = False
+            self.is_moving = True
