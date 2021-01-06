@@ -1,6 +1,9 @@
 import pygame
 import os
 from Map import Map
+from main import load_image
+from StartScreen import StartScreen
+from Points import Points
 
 FPS = 30
 WIDTH = 1200
@@ -31,6 +34,7 @@ INTRO = [["Начать игру", 0],
 # Шрифт надписей в игре
 FULLNAME = os.path.join('data', 'Firenight-Regular.otf')
 
+# Экран
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 screen.fill(pygame.Color("black"))
 
@@ -48,6 +52,40 @@ ghost_sprites = pygame.sprite.Group()
 pacman_kill = pygame.sprite.Group()
 pacman_sprite = pygame.sprite.Group()
 
+# Карта и часы
 map_on_screen = Map("map.png")
 clock = pygame.time.Clock()
 map_on_screen_num = 1
+
+# Начальные значения для главного меню
+f1, f2, f3, f4, f5 = False, False, False, False, False
+f6 = False
+color_back = 0
+ghost_on_screen = 0
+
+# Основные флаги
+running = True
+mouse_on_screen = None
+
+# Саундтрек игры
+song = os.path.join('data', 'music.mp3')
+music_on = True
+
+# Загрузка изображений
+image_life = load_image('pacman_lives.png')
+game_over_image = load_image("game_over.png")
+winn_level = load_image('winn_level.png')
+
+# Начало игры
+start = StartScreen()
+
+# Для игры
+score = 0
+lives = 3
+stop_game = False
+start_game = False
+stop = False
+iteration_kill = 0
+kill_num = 0
+iterations = 0
+points = Points()
