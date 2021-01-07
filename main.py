@@ -142,6 +142,55 @@ def show_start_screen():
     all_ghosts.draw(screen)
 
 
+def about():
+    """
+    Обработка действий с окном описания игры
+    :return:
+    """
+    global mouse_on_screen, f6, color_back, music_on
+    f6 = False
+    color_back = 0
+    while True:
+        show_about()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            # Включение / выключение звука
+            elif pygame.key.get_pressed()[pygame.K_e]:
+                if music_on:
+                    pygame.mixer.music.pause()
+                    music_on = False
+                else:
+                    pygame.mixer.music.unpause()
+                    music_on = True
+            elif event.type == pygame.MOUSEMOTION:
+                show_about()
+                # Изменение цвета кнопки "Назад"
+                x, y = event.pos
+                if 563 <= x <= 563 + 75 and 597 <= y <= 597 + 37 and not f6:
+                    color_back = 1
+                    f6 = True
+                elif f6 and not (563 <= x <= 563 + 75 and 597 <= y <= 597 + 37):
+                    color_back = 0
+                    f6 = False
+                if pygame.mouse.get_focused():
+                    show_about()
+                    change_place(event.pos)
+                    mouse_on_screen = event.pos
+            # Обработка остановки призраков
+            elif event.type == CONTINUEMOVE:
+                for ghost in all_ghosts:
+                    ghost.continue_moving()
+                pygame.time.set_timer(CONTINUEMOVE, 0)
+            elif event.type == pygame.MOUSEBUTTONDOWN and \
+                    event.button == 1:
+                # Обработка выхода в главное меню
+                if f6:
+                    start_screen_on()
+                    return
+        pygame.display.flip()
+
+
 def controls_screen():
     """
     Обработка действий с окном управления
@@ -324,6 +373,89 @@ def show_about():
     all_sprites.draw(screen)
 
 
+def add_table(name):
+    """
+    Добавление нового рекорда в таблицу
+    :param name: имя игрока
+    :return:
+    """
+    # Добавление имени в файл с рекордами
+    file_path = os.path.join('data', 'records.txt')
+    file_records = open(file_path, mode='a')
+    file_records.write(str(score) + ' ' + name + '\n')
+    file_records.close()
+
+    # Сортировка файла с рекордами
+    file_records = open(file_path, mode='r')
+    data = file_records.readlines()
+    file_records.close()
+
+    data.sort(key=lambda a: int(a.split()[0]),
+              reverse=True)
+
+    # Запись отсортированного файла с рекордами
+    file_records = open(file_path, mode='w')
+    for line in data:
+        file_records.write(line)
+    file_records.close()
+
+
+def record_menu(end=False):
+    """
+    Меню рекордов
+    :param end: выбор меню в начале или в конце игры
+    :return:
+    """
+    global mouse_on_screen, mouse_on_screen, music_on
+    color_back = pygame.Color("white")
+
+    file_path = os.path.join('data', 'records.txt')
+    file_records = open(file_path, mode='r')
+    data = file_records.readlines()
+    file_records.close()
+
+    while True:
+        if end:
+            show_record_menu(data, color_back, True)
+        else:
+            show_record_menu(data, color_back)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+
+            elif pygame.key.get_pressed()[pygame.K_e]:
+                if music_on:
+                    pygame.mixer.music.pause()
+                    music_on = False
+                else:
+                    pygame.mixer.music.unpause()
+                    music_on = True
+            elif event.type == CONTINUEMOVE:
+                for ghost in all_ghosts:
+                    ghost.continue_moving()
+                pygame.time.set_timer(CONTINUEMOVE, 0)
+
+            elif event.type == pygame.MOUSEMOTION:
+                if 534 <= event.pos[0] <= 643 and 596 <= event.pos[1] <= 637:
+                    color_back = pygame.Color("yellow")
+                else:
+                    color_back = pygame.Color("white")
+                if end:
+                    show_record_menu(data, color_back, True)
+                else:
+                    show_record_menu(data, color_back)
+                if pygame.mouse.get_focused():
+                    change_place(event.pos)
+                    mouse_on_screen = event.pos
+
+            elif event.type == pygame.MOUSEBUTTONDOWN and \
+                    event.button == 1:
+                if 534 <= event.pos[0] <= 643 and 596 <= event.pos[1] <= 637:
+                    return
+        pygame.display.flip()
+
+
 Ghost(all_ghosts, GHOSTS[0])
 pygame.mixer.init()
 pygame.mixer.music.load(song)
@@ -331,3 +463,130 @@ pygame.mixer.music.play(100)
 pygame.mixer.music.set_volume(0.3)
 start_screen_on()
 before_game(map_on_screen_num)
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            terminate()
+        # Начало игры
+        elif pygame.key.get_pressed()[pygame.K_SPACE] and \
+                not start_game and not stop:
+
+            screen.fill(pygame.Color("black"))
+            all_maps.draw(screen)
+            start_game = True
+        # Включение / выключение звука
+        elif pygame.key.get_pressed()[pygame.K_e]:
+            if music_on:
+                pygame.mixer.music.pause()
+                music_on = False
+            else:
+                pygame.mixer.music.unpause()
+                music_on = True
+
+        # Изменения направления призраков
+        elif event.type == CHANGE:
+            for ghost in ghost_sprites:
+                ghost.change()
+            pygame.time.set_timer(CHANGE, 3500)
+        elif pygame.key.get_pressed()[pygame.K_ESCAPE] and start_game:
+            start_game = False
+            pause_menu()
+
+        # Движение пакмана
+        elif pygame.key.get_pressed()[pygame.K_RIGHT] and start_game:
+            for hero in pacman_sprite:
+                hero.move("right")
+        elif pygame.key.get_pressed()[pygame.K_LEFT] and start_game:
+            for hero in pacman_sprite:
+                hero.move("left")
+        elif pygame.key.get_pressed()[pygame.K_UP] and start_game:
+            for hero in pacman_sprite:
+                hero.move("up")
+        elif pygame.key.get_pressed()[pygame.K_DOWN] and start_game:
+            for hero in pacman_sprite:
+                hero.move("down")
+
+    # Игровой процесс
+    if start_game:
+        screen.fill(pygame.Color("black"))
+        if map_on_screen_num != 3:
+            draw_back(['Баллы', score], 'points')
+        else:
+            draw_back(['Баллы', score], 'points_3')
+        # Отрисовка всех групп спрайтов
+        all_points.draw(screen)
+        all_rects.update()
+        all_rects.draw(screen)
+        all_maps.draw(screen)
+        pacman_sprite.draw(screen)
+        for pacman in pacman_sprite:
+            pacman.move()
+
+        # Отрисовка оставшихся жизней
+        if map_on_screen_num != 3:
+            for i in range(lives):
+                screen.blit(image_life, (100 + 43 * i, 685))
+        else:
+            for i in range(lives):
+                screen.blit(image_life, (315 + 43 * i, 540))
+        if iterations == 10:
+            pacman_sprite.update()
+            iterations = 0
+        for ghost in ghost_sprites:
+            ghost.move()
+        ghost_sprites.update()
+        ghost_sprites.draw(screen)
+
+        iterations += 1
+        # Переключение на новый уровень
+        if (score == 1840 and map_on_screen_num == 1) or \
+                (score == 3680 and map_on_screen_num == 2):
+            start_game = False
+            winn_lvl()
+        # Выигрыш
+        if score == 4170 and map_on_screen_num == 3:
+            start_game = False
+            winn_game()
+
+        if stop_game:
+            lives -= 1
+            start_game = False
+            for pm in pacman_sprite:
+                x, y = pm.rect.x, pm.rect.y
+            kill_pacman = Pacman(pacman_kill, load_image("killing_pacman.png"),
+                                 11, 1, 32, 32, x, y)
+
+    # Остановка игрового процесса
+    if stop_game:
+        stop = True
+        screen.fill(pygame.Color("black"))
+        all_points.draw(screen)
+        all_rects.draw(screen)
+        all_maps.draw(screen)
+        ghost_sprites.draw(screen)
+        pacman_kill.draw(screen)
+        # Анимация смерти пакмана
+        iteration_kill += 1
+        if iteration_kill == 10:
+            pacman_kill.update()
+            iteration_kill = 0
+            kill_num += 1
+        if kill_num == 11:
+            kill_num = 0
+            stop_game = False
+            for ghost in ghost_sprites:
+                ghost.kill()
+            for pm in pacman_sprite:
+                pm.kill()
+            for pm in pacman_kill:
+                pm.kill()
+            if lives == -1:
+                # Запись рекорда игрока и завершение игры
+                add_table(new_record())
+                game_over()
+            else:
+                before_game(map_on_screen_num)
+                stop = False
+    clock.tick(FPS)
+    pygame.display.flip()
