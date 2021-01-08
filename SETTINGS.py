@@ -1,9 +1,10 @@
 import pygame
 import os
-from Map import Map
-from main import load_image
+
+
+from load_image import load_image
 from StartScreen import StartScreen
-from Points import Points
+
 
 FPS = 30
 WIDTH = 1200
@@ -53,7 +54,7 @@ pacman_kill = pygame.sprite.Group()
 pacman_sprite = pygame.sprite.Group()
 
 # Карта и часы
-map_on_screen = Map("map.png")
+
 clock = pygame.time.Clock()
 map_on_screen_num = 1
 
@@ -88,4 +89,4 @@ stop = False
 iteration_kill = 0
 kill_num = 0
 iterations = 0
-points = Points()
+

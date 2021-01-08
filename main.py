@@ -3,31 +3,22 @@ import sys
 import pygame
 from random import randint, choice
 from SETTINGS import FPS, WIDTH, HEIGHT, CHANGE, CONTINUEMOVE, GHOSTS, GHOSTSGAME, INTRO, FULLNAME, screen, all_sprites, \
-    all_ghosts, all_points, all_maps, all_rects, ghost_sprites, pacman_kill, pacman_sprite, clock, map_on_screen, \
+    all_ghosts, all_points, all_maps, all_rects, ghost_sprites, pacman_kill, pacman_sprite, clock, \
     map_on_screen_num, f1, f2, f3, f4, f5, f6, color_back, ghost_on_screen, running, mouse_on_screen, song, music_on, \
     image_life, game_over_image, winn_level, start, score, start_game, stop, stop_game, lives, iteration_kill, \
-    iterations, kill_num, points
+    iterations, kill_num
 from Ghost import Ghost
 from GhostInGame import GhostPlay
+from load_image import load_image
+from Points import Points
+from map import Map
+
+points = Points()
+map_on_screen = Map("map.png")
 
 pygame.init()
 pygame.display.set_caption('Pacman')
 pygame.mouse.set_visible(False)
-
-
-def load_image(name):
-    """
-    Загрузка картинки из файла в программу
-    :param name: имя файла с картинкой
-    :return: изображение, готовое для работы
-    """
-    fullname = os.path.join('data', name)
-    try:
-        image = pygame.image.load(fullname)
-        return image
-    except pygame.error as message:
-        print('Не можем загрузить изображение:', name)
-        raise SystemExit(message)
 
 
 def terminate():
@@ -37,58 +28,6 @@ def terminate():
     """
     pygame.quit()
     sys.exit()
-
-
-def start_screen_on():
-    """
-    Стартовый интерфейс
-    :return:
-    """
-    global mouse_on_screen, music_on
-    while True:
-        show_start_screen()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-
-            # Включение/выключение музыки
-            if pygame.key.get_pressed()[pygame.K_e]:
-                if music_on:
-                    pygame.mixer.music.pause()
-                    music_on = False
-                else:
-                    pygame.mixer.music.unpause()
-                    music_on = True
-
-            elif event.type == pygame.MOUSEMOTION:
-                change_text_start(event.pos)
-                if pygame.mouse.get_focused():
-                    change_place(event.pos)
-                    mouse_on_screen = event.pos
-            elif event.type == CONTINUEMOVE:
-                for ghost in all_ghosts:
-                    ghost.continue_moving()
-                pygame.time.set_timer(CONTINUEMOVE, 0)
-            elif event.type == pygame.MOUSEBUTTONDOWN and \
-                    event.button == 1:
-                # Кнопка "Начать игру"
-                if f1:
-                    return
-                # Кнопка "Управление"
-                elif f2:
-                    controls_screen()
-                    return
-                # Кнопка "Об игре"
-                elif f3:
-                    about()
-                # Кнопка "Таблица рекордов"
-                elif f4:
-                    record_menu()
-                # Кнопка "Выход"
-                elif f5:
-                    terminate()
-        pygame.display.flip()
 
 
 def before_game(map=1):
@@ -188,6 +127,58 @@ def about():
                 if f6:
                     start_screen_on()
                     return
+        pygame.display.flip()
+
+
+def start_screen_on():
+    """
+    Стартовый интерфейс
+    :return:
+    """
+    global mouse_on_screen, music_on
+    while True:
+        show_start_screen()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+
+            # Включение/выключение музыки
+            if pygame.key.get_pressed()[pygame.K_e]:
+                if music_on:
+                    pygame.mixer.music.pause()
+                    music_on = False
+                else:
+                    pygame.mixer.music.unpause()
+                    music_on = True
+
+            elif event.type == pygame.MOUSEMOTION:
+                change_text_start(event.pos)
+                if pygame.mouse.get_focused():
+                    change_place(event.pos)
+                    mouse_on_screen = event.pos
+            elif event.type == CONTINUEMOVE:
+                for ghost in all_ghosts:
+                    ghost.continue_moving()
+                pygame.time.set_timer(CONTINUEMOVE, 0)
+            elif event.type == pygame.MOUSEBUTTONDOWN and \
+                    event.button == 1:
+                # Кнопка "Начать игру"
+                if f1:
+                    return
+                # Кнопка "Управление"
+                elif f2:
+                    controls_screen()
+                    return
+                # Кнопка "Об игре"
+                elif f3:
+                    about()
+                # Кнопка "Таблица рекордов"
+                elif f4:
+                    record_menu()
+                # Кнопка "Выход"
+                elif f5:
+                    terminate()
         pygame.display.flip()
 
 
@@ -455,14 +446,15 @@ def record_menu(end=False):
                     return
         pygame.display.flip()
 
-
+start_screen_on()
+before_game(map_on_screen_num)
 Ghost(all_ghosts, GHOSTS[0])
 pygame.mixer.init()
 pygame.mixer.music.load(song)
 pygame.mixer.music.play(100)
 pygame.mixer.music.set_volume(0.3)
-start_screen_on()
-before_game(map_on_screen_num)
+
+
 
 while True:
     for event in pygame.event.get():

@@ -1,11 +1,11 @@
 import pygame
-from main import load_image
+from load_image import load_image
 from SETTINGS import HEIGHT, WIDTH, all_ghosts, GHOSTS, FULLNAME
 
 
 class Ghost(pygame.sprite.Sprite):
     """
-    Класс привидений для стартового меню
+    Класс призраков в стартовом меню
     """
 
     def __init__(self, group, ghost_name):

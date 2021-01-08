@@ -1,19 +1,21 @@
 import pygame
-from SETTINGS import HEIGHT, WIDTH, GHOSTSGAME, ghost_sprites, pacman_sprite, map_on_screen
+from SETTINGS import HEIGHT, WIDTH, GHOSTSGAME, ghost_sprites, pacman_sprite
+
 from random import randint, choice
-from main import load_image
+from load_image import load_image
 
 
 class GhostPlay(pygame.sprite.Sprite):
     """
-    Класс призраков в игровом процессе
+    Класс призраков в игре
     """
 
-    def __init__(self, num):
+    def __init__(self, num, map_on_screen):
         super().__init__(ghost_sprites)
         image = load_image(GHOSTSGAME[num % 4][0])
         size_h = image.get_height()
         self.num = num % 4
+        self.map_on_screen = map_on_screen
         # скорость призрака
         self.v = 3
         self.way = 1
@@ -38,28 +40,28 @@ class GhostPlay(pygame.sprite.Sprite):
         if self.way == 1:
             self.image = load_image(GHOSTSGAME[self.num][0])
             self.rect.y -= self.v
-            if pygame.sprite.collide_mask(self, map_on_screen):
+            if pygame.sprite.collide_mask(self, self.map_on_screen):
                 self.rect.y += 2 * self.v
                 self.way = choice([2, 4])
 
         elif self.way == 2:
             self.image = load_image(GHOSTSGAME[self.num][3])
             self.rect.x += self.v
-            if pygame.sprite.collide_mask(self, map_on_screen):
+            if pygame.sprite.collide_mask(self, self.map_on_screen):
                 self.rect.x -= 2 * self.v
                 self.way = choice([1, 3])
 
         elif self.way == 3:
             self.image = load_image(GHOSTSGAME[self.num][1])
             self.rect.y += self.v
-            if pygame.sprite.collide_mask(self, map_on_screen):
+            if pygame.sprite.collide_mask(self, self.map_on_screen):
                 self.rect.y -= 2 * self.v
                 self.way = choice([2, 4])
 
         elif self.way == 4:
             self.image = load_image(GHOSTSGAME[self.num][2])
             self.rect.x -= self.v
-            if pygame.sprite.collide_mask(self, map_on_screen):
+            if pygame.sprite.collide_mask(self, self.map_on_screen):
                 self.rect.x += 2 * self.v
                 self.way = choice([1, 3])
 

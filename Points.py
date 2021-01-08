@@ -1,6 +1,6 @@
 import pygame
 from SETTINGS import all_points, WIDTH, HEIGHT, map_on_screen_num
-from main import load_image
+from load_image import load_image
 
 
 class Points(pygame.sprite.Sprite):

@@ -1,6 +1,7 @@
 import pygame
-from main import load_image
+from load_image import load_image
 from SETTINGS import all_maps, WIDTH, HEIGHT
+
 
 class Map(pygame.sprite.Sprite):
     """
