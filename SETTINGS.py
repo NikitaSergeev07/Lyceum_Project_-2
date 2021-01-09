@@ -1,10 +1,7 @@
 import pygame
 import os
 
-
 from load_image import load_image
-from StartScreen import StartScreen
-
 
 FPS = 30
 WIDTH = 1200
@@ -61,8 +58,8 @@ map_on_screen_num = 1
 # Начальные значения для главного меню
 f1, f2, f3, f4, f5 = False, False, False, False, False
 f6 = False
-color_back = 0
 ghost_on_screen = 0
+color_back = 0
 
 # Основные флаги
 running = True
@@ -77,9 +74,6 @@ image_life = load_image('pacman_lives.png')
 game_over_image = load_image("game_over.png")
 winn_level = load_image('winn_level.png')
 
-# Начало игры
-start = StartScreen()
-
 # Для игры
 score = 0
 lives = 3
@@ -89,4 +83,3 @@ stop = False
 iteration_kill = 0
 kill_num = 0
 iterations = 0
-

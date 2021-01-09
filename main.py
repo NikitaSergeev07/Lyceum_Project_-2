@@ -5,20 +5,23 @@ from random import randint, choice
 from SETTINGS import FPS, WIDTH, HEIGHT, CHANGE, CONTINUEMOVE, GHOSTS, GHOSTSGAME, INTRO, FULLNAME, screen, all_sprites, \
     all_ghosts, all_points, all_maps, all_rects, ghost_sprites, pacman_kill, pacman_sprite, clock, \
     map_on_screen_num, f1, f2, f3, f4, f5, f6, color_back, ghost_on_screen, running, mouse_on_screen, song, music_on, \
-    image_life, game_over_image, winn_level, start, score, start_game, stop, stop_game, lives, iteration_kill, \
+    image_life, game_over_image, winn_level, score, start_game, stop, stop_game, lives, iteration_kill, \
     iterations, kill_num
 from Ghost import Ghost
 from GhostInGame import GhostPlay
 from load_image import load_image
 from Points import Points
 from map import Map
+from StartScreen import StartScreen
+from Rects import Rects
+
 
 points = Points()
 map_on_screen = Map("map.png")
-
 pygame.init()
 pygame.display.set_caption('Pacman')
 pygame.mouse.set_visible(False)
+start = StartScreen()
 
 
 def terminate():
@@ -446,6 +449,7 @@ def record_menu(end=False):
                     return
         pygame.display.flip()
 
+
 start_screen_on()
 before_game(map_on_screen_num)
 Ghost(all_ghosts, GHOSTS[0])
@@ -453,8 +457,6 @@ pygame.mixer.init()
 pygame.mixer.music.load(song)
 pygame.mixer.music.play(100)
 pygame.mixer.music.set_volume(0.3)
-
-
 
 while True:
     for event in pygame.event.get():
