@@ -1,85 +1,99 @@
 import pygame
+import math
+from random import randrange
+import random
+import copy
 import os
+from main import Game
+from Ghost import Ghost
+from Pacman import Pacman
 
-from load_image import load_image
+BoardPath = "Assets/BoardImages/"
+ElementPath = "Assets/ElementImages/"
+TextPath = "Assets/TextImages/"
+DataPath = "Assets/Data/"
+MusicPath = "Assets/Music/"
 
-FPS = 30
-WIDTH = 1200
-HEIGHT = 750
+pygame.mixer.init()
+pygame.init()
+print(pygame.mixer.music.get_busy())
 
-# Таймеры
-CHANGE = 30
-CONTINUEMOVE = 31
+# 28 Across 31 Tall 1: Empty Space 2: Tic-Tak 3: Wall 4: Ghost safe-space 5: Special Tic-Tak
+originalGameBoard = [
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 6, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 6, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 1, 3, 3, 1, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 4, 4, 4, 4, 4, 4, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, 4, 4, 4, 4, 4, 4, 3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1],  # Middle Lane Row: 14
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 4, 4, 4, 4, 4, 4, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 2, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 2, 3, 3, 3, 3, 3, 3],
+    [3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 2, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 2, 3],
+    [3, 6, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 6, 3],
+    [3, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 3],
+    [3, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 2, 3, 3, 3],
+    [3, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 3],
+    [3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3],
+    [3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3],
+    [3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+]
+gameBoard = copy.deepcopy(originalGameBoard)
+spriteRatio = 3 / 2
+square = 30  # Size of each unit square
+spriteOffset = square * (1 - spriteRatio) * (1 / 2)
+(width, height) = (len(gameBoard[0]) * square, len(gameBoard) * square)  # Game screen
+screen = pygame.display.set_mode((width, height))
+pygame.display.flip()
+musicPlaying = 0  # 0: Chomp, 1: Important, 2: Siren
+# pelletColor = (165, 93, 53)
+pelletColor = (222, 161, 133)
+game = Game(1, 0)
+ghostsafeArea = [15, 13]  # The location the ghosts escape to when attacked
+ghostGate = [[15, 13], [15, 14]]
 
-GHOSTS = [('Inky.png', 'INKY', (26, 175, 230)),
-          ('Blinky.png', 'Blinky', (231, 0, 10)),
-          ('Pinky.png', 'Pinky', (242, 159, 183)),
-          ('Clyde.png', 'Clyde', (231, 141, 0))]
-GHOSTSGAME = [('blinky_up.png', 'blinky_down.png',
-               'blinky_left.png', 'blinky_right.png'),
-              ('pinky_up.png', 'pinky_down.png',
-               'pinky_left.png', 'pinky_right.png'),
-              ('clyde_up.png', 'clyde_down.png',
-               'clyde_left.png', 'clyde_right.png'),
-              ('inky_up.png', 'inky_down.png',
-               'inky_left.png', 'inky_right.png')]
-INTRO = [["Начать игру", 0],
-         ["Управление", 0],
-         ["Об игре", 0],
-         ["Таблица рекордов", 0],
-         ["Выход", 0]]
 
-# Шрифт надписей в игре
-FULLNAME = os.path.join('data', 'Firenight-Regular.otf')
+def canMove(row, col):
+    if col == -1 or col == len(gameBoard[0]):
+        return True
+    if gameBoard[int(row)][int(col)] != 3:
+        return True
+    return False
 
-# Экран
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-screen.fill(pygame.Color("black"))
 
-# Группы спрайтов для стартового экрана
-all_sprites = pygame.sprite.Group()
-all_ghosts = pygame.sprite.Group()
+# Reset after death
+def reset():
+    global game
+    game.ghosts = [Ghost(14.0, 13.5, "red", 0), Ghost(17.0, 11.5, "blue", 1), Ghost(17.0, 13.5, "pink", 2),
+                   Ghost(17.0, 15.5, "orange", 3)]
+    for ghost in game.ghosts:
+        ghost.setTarget()
+    game.pacman = Pacman(26.0, 13.5)
+    game.lives -= 1
+    game.paused = True
+    game.render()
 
-# Группы спрайтов интерфейса карты
-all_maps = pygame.sprite.Group()
-all_points = pygame.sprite.Group()
-all_rects = pygame.sprite.Group()
 
-# Группы спрайтов-персонажей
-ghost_sprites = pygame.sprite.Group()
-pacman_kill = pygame.sprite.Group()
-pacman_sprite = pygame.sprite.Group()
-
-# Карта и часы
-
-clock = pygame.time.Clock()
-map_on_screen_num = 1
-
-# Начальные значения для главного меню
-f1, f2, f3, f4, f5 = False, False, False, False, False
-f6 = False
-ghost_on_screen = 0
-color_back = 0
-
-# Основные флаги
-running = True
-mouse_on_screen = None
-
-# Саундтрек игры
-song = os.path.join('data', 'music.mp3')
-music_on = True
-
-# Загрузка изображений
-image_life = load_image('pacman_lives.png')
-game_over_image = load_image("game_over.png")
-winn_level = load_image('winn_level.png')
-
-# Для игры
-score = 0
-lives = 3
-stop_game = False
-start_game = False
-stop = False
-iteration_kill = 0
-kill_num = 0
-iterations = 0
+def pause(time):
+    cur = 0
+    while not cur == time:
+        cur += 1
