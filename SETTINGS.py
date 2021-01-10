@@ -3,6 +3,7 @@ import copy
 from main import Game
 from Ghost import Ghost
 from Pacman import Pacman
+from StartScreen import StartScreen
 
 BoardPath = "Assets/BoardImages/"
 ElementPath = "Assets/ElementImages/"
@@ -66,3 +67,4 @@ pelletColor = (222, 161, 133)
 game = Game(1, 0)
 ghostsafeArea = [15, 13]  # Местонахожение локации призраков
 ghostGate = [[15, 13], [15, 14]]
+start = StartScreen()
