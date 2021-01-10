@@ -2,7 +2,7 @@ import pygame
 import os
 
 WIDTH = 700
-HEIGHT = 360
+HEIGHT = 650
 
 GHOSTS = [('Inky.png', 'INKY', (26, 175, 230)),
           ('Blinky.png', 'Blinky', (231, 0, 10)),
