@@ -3,6 +3,7 @@ import math
 from random import randrange
 import random
 import copy
+import os
 from settings_for_startscreen import screen, all_sprites, all_ghosts, mouse_on_screen
 
 
@@ -33,6 +34,20 @@ def reset():
     game.lives -= 1
     game.paused = True
     game.render()
+
+def load_image(name):
+    """
+    Загрузка картинки из файла в программу
+    имя файла с картинкой
+    изображение, готовое для работы
+    """
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+        return image
+    except pygame.error as message:
+        print('Не можем загрузить изображение:', name)
+        raise SystemExit(message)
 
 
 
