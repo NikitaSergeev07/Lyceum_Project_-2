@@ -1,8 +1,5 @@
 import pygame
 import copy
-from main import Game
-from Ghost import Ghost
-from Pacman import Pacman
 from StartScreen import StartScreen
 
 BoardPath = "Assets/BoardImages/"
@@ -13,7 +10,6 @@ MusicPath = "Assets/Music/"
 
 pygame.mixer.init()
 pygame.init()
-print(pygame.mixer.music.get_busy())
 
 #  1: Пустое пространство 2: Tic-tack или кружки 3: Стены 4: Безопасное место возраждения призраков 5: Особые Tic-tac или ягоды
 originalGameBoard = [
@@ -56,15 +52,15 @@ originalGameBoard = [
 ]
 gameBoard = copy.deepcopy(originalGameBoard)
 spriteRatio = 3 / 2
-square = 30  # Размер кажной единицы квадрата
-spriteOffset = square * (1 - spriteRatio) * (1 / 4)
-(width, height) = (len(gameBoard[0]) * square, len(gameBoard) * square)  # Игровой экран
+square = 25
+spriteOffset = square * (1 - spriteRatio) * (1 / 2)
+(width, height) = (len(gameBoard[0]) * square, len(gameBoard) * square)
 screen = pygame.display.set_mode((width, height))
 pygame.display.flip()
-musicPlaying = 0  # 0: Chomp, 1: Important, 2: Siren
-# pelletColor = (165, 93, 53)
+musicPlaying = 0
 pelletColor = (222, 161, 133)
-game = Game(1, 0)
-ghostsafeArea = [15, 13]  # Местонахожение локации призраков
+# game = Game(1, 0)
+ghostsafeArea = [15, 13]
 ghostGate = [[15, 13], [15, 14]]
-start = StartScreen()
+# start = StartScreen()
+

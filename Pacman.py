@@ -3,6 +3,7 @@ import math
 from SETTINGS import screen, square, canMove, ElementPath, spriteRatio, spriteOffset, game
 
 
+
 # Класс, отвечающий за работу пакмана
 class Pacman:
     def __init__(self, row, col):

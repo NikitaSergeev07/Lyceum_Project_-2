@@ -13,7 +13,7 @@ class StartScreen:
         sprite = pygame.sprite.Sprite()
         sprite.image = image
         sprite.rect = sprite.image.get_rect()
-        sprite.rect.x = (WIDTH - 115) - image.get_width()
+        sprite.rect.x = (WIDTH - 100) - image.get_width()
         sprite.rect.y = 0
         all_sprites.add(sprite)
 
@@ -24,9 +24,9 @@ class StartScreen:
                 color = pygame.Color("white")
             else:
                 color = pygame.Color("yellow")
-            font = pygame.font.Font(FULLNAME, 30)
+            font = pygame.font.Font(FULLNAME, 25)
             text = font.render(INTRO[i][0], 1, (color))
-            start_x = (WIDTH + 80) // 2 - text.get_width() // 2
+            start_x = (WIDTH + 50) // 2 - text.get_width() // 2
             start_y = HEIGHT // 2 - text.get_height() // 2 - 50
             text_x = start_x
             text_y = start_y + i * 60
